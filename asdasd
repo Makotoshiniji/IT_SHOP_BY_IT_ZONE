@@ -1,0 +1,199 @@
+class BillWindow(QtWidgets.QWidget):
+    def __init__(self, order_id, total_price=0, discount=0, net_amount=0):
+        super().__init__()
+        self.order_id = order_id
+        self.total_price = total_price
+        self.discount = discount
+        self.net_amount = net_amount
+        self.setup_ui()
+        # self.order_id = order_id
+        # print(f"Initializing BillWindow with order_id: {order_id}")  # เพิ่มการดีบัก
+        # self.setWindowTitle("BILL")
+        # self.setGeometry(360, 110, 700, 600)
+        # self.setWindowIcon(QtGui.QIcon("image/IT ZONE LOGO.png"))
+
+        # self.setup_ui()
+
+
+        self.setWindowTitle("BILL")
+        self.setGeometry(360, 110, 700, 600)
+        self.setWindowIcon(QtGui.QIcon("image/IT ZONE LOGO.png"))
+
+        self.setup_ui()
+
+    def setup_ui(self):
+        """สร้าง UI ของหน้าบิล"""
+        try:
+            print("Setting up BillWindow UI...")  # เพิ่มการดีบัก
+            layout = QtWidgets.QVBoxLayout(self)
+
+            # ส่วนหัวบิล (ชื่อร้านและวันที่)
+            header_layout = QtWidgets.QVBoxLayout()
+            shop_name_label = QtWidgets.QLabel("ร้าน IT ZONE")
+            shop_name_label.setFont(QtGui.QFont("Arial", 20, QtGui.QFont.Weight.Bold))
+            shop_name_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+            shop_name_label.setStyleSheet("color: #000000;")
+
+            date_label = QtWidgets.QLabel(f"วันที่: {QtCore.QDate.currentDate().toString('yyyy-MM-dd')}")
+            date_label.setFont(QtGui.QFont("Arial", 12))
+            date_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+            date_label.setStyleSheet("color: #333333;")
+
+            header_layout.addWidget(shop_name_label)
+            header_layout.addWidget(date_label)
+            layout.addLayout(header_layout)
+
+            # ส่วนตารางแสดงบิล
+            self.table = QtWidgets.QTableWidget(self)
+            self.table.setRowCount(0)
+            self.table.setColumnCount(3)  # เปลี่ยนเป็น 3 คอลัมน์ (ชื่อสินค้า, จำนวน, รวมราคา)
+            self.table.setHorizontalHeaderLabels(["ชื่อสินค้า", "จำนวน", "รวมราคา"])
+
+            # ปรับขนาดคอลัมน์
+            self.table.setColumnWidth(0, 350)  # กำหนดให้คอลัมน์ "ชื่อสินค้า" กว้างสุด
+            self.table.setColumnWidth(1, 100)  # กำหนดขนาดคอลัมน์ "จำนวน"
+            self.table.setColumnWidth(2, 150)  # กำหนดขนาดคอลัมน์ "รวมราคา"
+
+            # ปรับสไตล์ตาราง
+            self.table.setStyleSheet("""
+                QTableWidget {
+                    border: 1px solid #d3d3d3;
+                    font-size: 14px;
+                    padding: 5px;
+                }
+                QTableWidget::item {
+                    padding: 10px;
+                }
+                QTableWidget::horizontalHeader {
+                    background-color: #f4f4f4;
+                    font-weight: bold;
+                }
+                QHeaderView::section {
+                    background-color: #f4f4f4;
+                    border: none;
+                }
+            """)
+
+            # ทำให้ตัวเลขในคอลัมน์ "จำนวน" อยู่ตรงกลาง
+            for i in range(self.table.rowCount()):
+                self.table.item(i, 1).setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+
+            self.table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
+            layout.addWidget(self.table)
+
+            # ส่วนสำหรับยอดรวม
+            total_layout = QtWidgets.QHBoxLayout()
+            total_label = QtWidgets.QLabel("ยอดรวม: ")
+            total_label.setFont(QtGui.QFont("Arial", 16, QtGui.QFont.Weight.Bold))
+            total_label.setStyleSheet("color: #000000;")
+            
+            self.total_amount_label = QtWidgets.QLabel("฿0.00")
+            self.total_amount_label.setFont(QtGui.QFont("Arial", 16, QtGui.QFont.Weight.Bold))
+            self.total_amount_label.setStyleSheet("color: #e60000;")
+
+            total_layout.addWidget(total_label)
+            total_layout.addWidget(self.total_amount_label, alignment=QtCore.Qt.AlignmentFlag.AlignRight)
+            layout.addLayout(total_layout)
+
+            # ปุ่มปิด
+            close_button = QtWidgets.QPushButton("ปิด")
+            close_button.setFont(QtGui.QFont("Arial", 14))
+            close_button.setStyleSheet("""
+                QPushButton {
+                    background-color: #ff6666;
+                    color: #ffffff;
+                    border-radius: 10px;
+                    padding: 10px;
+                }
+                QPushButton:hover {
+                    background-color: #ff3333;
+                }
+            """)
+            close_button.clicked.connect(self.close)
+            layout.addWidget(close_button, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
+
+            # ปุ่มกลับไปหน้าหลัก
+            back_button = QtWidgets.QPushButton("กลับไปหน้าหลัก")
+            back_button.setFont(QtGui.QFont("Arial", 14))
+            back_button.setStyleSheet("""
+                QPushButton {
+                    background-color: #4CAF50;
+                    color: #ffffff;
+                    border-radius: 10px;
+                    padding: 10px;
+                }
+                QPushButton:hover {
+                    background-color: #45a049;
+                }
+            """)
+            back_button.clicked.connect(self.go_to_home)  # เชื่อมต่อกับฟังก์ชัน go_to_main_window
+            layout.addWidget(back_button, alignment=QtCore.Qt.AlignmentFlag.AlignCenter)
+
+            # แทรกรูป QR Code ที่นี่
+            self.qr_code_label = QtWidgets.QLabel(self)
+            qr_code_pixmap = QtGui.QPixmap("assets/image/PHONE icon.png")  # กำหนดที่อยู่ของ QR Code
+            self.qr_code_label.setPixmap(qr_code_pixmap.scaled(100, 100, QtCore.Qt.AspectRatioMode.KeepAspectRatio))
+            self.qr_code_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+            layout.addWidget(self.qr_code_label)
+
+            # โหลดรายละเอียดบิล
+            self.load_bill_details()
+
+        except Exception as e:
+            print(f"Error in setting up UI: {e}")
+            QtWidgets.QMessageBox.warning(self, "ข้อผิดพลาด", "ไม่สามารถตั้งค่า UI ของบิลได้")
+
+    def load_bill_details(self):
+        """ดึงข้อมูลรายละเอียดสินค้าจากฐานข้อมูลและแสดงในตาราง"""
+        try:
+            print(f"Loading bill details for order_id: {self.order_id}")  # เพิ่มการดีบัก
+            connection = mysql.connector.connect(
+                host='localhost',
+                user='root',
+                password='',
+                database='db_itshop'
+            )
+            cursor = connection.cursor()
+
+            cursor.execute("""
+                SELECT 
+                    p.product_name, 
+                    od.quantity, 
+                    (od.quantity * p.price) AS total_price
+                FROM 
+                    order_detail od
+                JOIN 
+                    products p ON od.product_code = p.product_code
+                WHERE 
+                    od.order_id = %s
+            """, (self.order_id,))
+            rows = cursor.fetchall()
+            print(f"Fetched rows: {rows}")  # เพิ่มการดีบัก
+
+            self.table.setRowCount(len(rows))
+            total_price = self.net_amount
+            for i, row in enumerate(rows):
+                print(f"Adding row {i}: {row}")  # เพิ่มการดีบัก
+                self.table.setItem(i, 0, QtWidgets.QTableWidgetItem(row[0]))  # ชื่อสินค้า
+                self.table.setItem(i, 1, QtWidgets.QTableWidgetItem(str(row[1])))  # จำนวน
+                self.table.setItem(i, 2, QtWidgets.QTableWidgetItem(f"฿{row[2]:,.2f}"))  # รวมราคา
+                total_price += row[2]  # คำนวณยอดรวม
+
+            # แสดงยอดรวม
+            self.total_amount_label.setText(f"฿{total_price:,.2f}")
+
+            cursor.close()
+            connection.close()
+
+        except mysql.connector.Error as err:
+            print(f"Database error: {err}")
+            QtWidgets.QMessageBox.warning(self, "ข้อผิดพลาด", "ไม่สามารถดึงข้อมูลบิลได้")
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            QtWidgets.QMessageBox.warning(self, "ข้อผิดพลาด", "ไม่สามารถดึงข้อมูลบิลได้")
+
+
+    def go_to_home(self):
+        self.home_page = Homepage()  # สร้างหน้าแรก
+        self.home_page.show()  # แสดงหน้าแรก
+        self.close()  # ปิดหน้าต่างล็อกอิน

@@ -1,0 +1,11 @@
+ตัวย่อประเภทสินค้า2ตัว+ตัวย่อแบรนด์2ตัว+เลขหลักพัน
+
+ประเภทสินค้า 
+MT - Monitor
+NB - Notebook
+PH - Phone
+
+
+แบรนด์
+SS - Samsung
+GB - Gigabyte
